@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live TV Player | RYVOX Tb</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
+    <style>
+        /* BASE LAYOUT */
+        
+        /* বডির মার্জিন ও প্যাডিং রিমুভ করা হয়েছে যাতে স্ক্রিনের সাথে পুরোটা মিলে যায় */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4; 
+        }
+
+        /* HEADER এবং FOOTER এর জন্য স্টাইল (অপরিবর্তিত রাখা হলো) */
+        /* ধরে নেওয়া হলো, এই স্টাইলগুলো styles.css বা অন্য কোনো কোডের অংশ */
+        
+        /* MAIN PLAYER CONTENT */
+        .player-content {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start; 
+            /* মোবাইল ভিউতে প্যাডিং রিমুভ করার জন্য এখানে শুধু বড় স্ক্রিনের প্যাডিং রাখা হয়েছে */
+            padding: 40px 20px;
+            min-height: 70vh; 
+            background-color: #f4f4f4; 
+        }
+        
+        /* ভিডিও কন্টেইনার */
+        .video-container { 
+            width: 800px; 
+            max-width: 95%; 
+            margin-right: auto; 
+        }
+
+        /* ভিডিও প্লেয়ারের ফ্রেম */
+        .video-wrapper {
+            position: relative;
+            width: 100%; 
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 12px; 
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); 
+            overflow: hidden;
+            border: 4px solid #00bfff;
+            cursor: pointer;
+            transition: border-radius 0.3s ease;
+        }
+
+        #liveStreamPlayer {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: #000;
+        }
+
+        /* --- কাস্টম কন্ট্রোল বার (ভিডিও স্ক্রিনের নিচে) স্টাইল --- */
+        .custom-controls-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 15px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none; 
+            box-sizing: border-box;
+        }
+        
+        .custom-controls-bottom.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* ভলিউম কন্ট্রোল এবং ফুলস্ক্রিন বাটন এর স্টাইল */
+        .volume-controls, .fullscreen-button {
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        .volume-controls button, .fullscreen-button button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            outline: none;
+            width: 35px; 
+            height: 35px;
+        }
+        
+        /* ভলিউম স্লাইডার স্টাইল */
+        #volumeSlider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 80px; 
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            outline: none;
+            opacity: 1;
+            border-radius: 2px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        #volumeSlider::-webkit-slider-thumb,
+        #volumeSlider::-moz-range-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00bfff;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        
+        #volumeValue {
+            font-size: 0.8em;
+            margin-left: 5px;
+            min-width: 30px; 
+        }
+
+        /* --- লোডিং স্পিনার এবং প্লে/পজ ওভারলে স্টাইল --- */
+        .loading-spinner {
+            /* ... (অপরিবর্তিত) ... */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            color: white;
+            font-size: 1.2em;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-spinner.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #00bfff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .play-pause-overlay {
+            /* ... (অপরিবর্তিত) ... */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 3em;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .video-wrapper.paused .play-pause-overlay {
+            opacity: 1;
+        }
+
+        /* --- ফুলস্ক্রিন মোড এবং মোবাইল রেসপনসিভ স্টাইল (মোবাইল ভিউ ঠিক করা হয়েছে) --- */
+        
+        /* ফুলস্ক্রিন মোড */
+        .video-wrapper:-webkit-full-screen,
+        .video-wrapper:-moz-full-screen,
+        .video-wrapper:fullscreen {
+            border-radius: 0 !important;
+            border: none !important;
+        }
+        
+        /* ট্যাবলেট/ল্যাপটপের জন্য */
+        @media (max-width: 1024px) {
+            .video-container {
+                width: 100%; 
+            }
+            .video-wrapper {
+                border-radius: 0;
+                border-width: 0;
+            }
+            /* প্লেয়ার কন্টেন্ট প্যাডিং রিমুভ করা হয়েছে যাতে পুরো স্ক্রিন জুড়ে থাকে */
+            .player-content {
+                padding: 0; 
+                align-items: stretch; /* কন্টেইনার যাতে ফুল হাইট নিতে পারে */
+            }
+        }
+
+        /* মোবাইল স্ক্রিনের জন্য বিশেষ অ্যাডজাস্টমেন্ট */
+        @media (max-width: 768px) {
+            .video-container {
+                 /* 768px এর নিচে কন্টেইনারে আর max-width এর প্রয়োজন নেই, 100% হবে */
+                 max-width: 100%; 
+            }
+        }
+        
+        /* ছোট মোবাইল স্ক্রিন (480px এর নিচে) */
+        @media (max-width: 480px) {
+            .custom-controls-bottom {
+                padding: 5px 8px;
+            }
+            #volumeSlider {
+                width: 60px;
+            }
+            #volumeValue {
+                display: none;
+            }
+            .volume-controls button, .fullscreen-button button {
+                font-size: 1.1em;
+                width: 30px;
+                height: 30px;
+            }
+            .play-pause-overlay {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+            }
+            .player-content {
+                /* নিশ্চিত করা হলো যে প্যাডিং ০ আছে */
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo-text">
+                <span class="ryvox-brand">RYVOX</span><span class="tb-brand">Tb</span>
+            </div>
+            <p class="email-address">ryvox.tb@gmail.com</p>
+        </div>
+        
+        <nav class="main-nav" id="main-nav">
+            <ul class="nav-list">
+                <li><a href="index.html" class="category-link" data-category="all"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" class="category-link" data-category="sports"><i class="fas fa-running"></i> Sports</a></li>
+                <li><a href="#" class="category-link" data-category="news"><i class="far fa-newspaper"></i> News</a></li>
+                <li><a href="#" class="category-link" data-category="movies"><i class="fas fa-film"></i> Movies</a></li> 
+            </ul>
+        </nav>
+        
+        <div class="search-section">
+            <input type="text" placeholder="Search Tv" class="search-input" id="searchInput">
+            <button class="search-button" id="searchButton"><i class="fas fa-search"></i></button>
+        </div>
+
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+
+    <main class="player-content">
+        <div class="video-container">
+            <div class="video-wrapper" id="videoWrapper">
+                <video 
+                    id="liveStreamPlayer" 
+                    autoplay 
+                    playsinline 
+                    muted 
+                    poster="tV Pane.png"
+                    style="width:100%; height:100%;"
+                    >
+                </video>
+                
+                <div class="custom-controls-bottom" id="customControlsBottom">
+                    
+                    <div class="volume-controls">
+                        <button id="muteButton" aria-label="Mute/Unmute">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+                        <span id="volumeValue">50%</span>
+                    </div>
+
+                    <div class="fullscreen-button">
+                        <button id="fullscreenButton" aria-label="Toggle Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <p>Loading Live Stream...</p>
+                </div>
+
+                <div class="play-pause-overlay" id="playPauseOverlay">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <span class="ryvox-brand">RYVOX</span><span class="tb-brand">Tb</span>
+                <p>&copy; 2024 All Rights Reserved. | Designed by RYVOX</p>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-envelope"></i>: ryvox.tb@gmail.com</p>
+                <div class="social-icons">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('menu-toggle').onclick = function() {
+            document.getElementById('main-nav').classList.toggle('active');
+        };
+
+        document.querySelectorAll('.category-link').forEach(link => {
+            link.addEventListener('click', function(event) {
+                if (this.getAttribute('href') === '#') {
+                    event.preventDefault();
+                }
+                const category = this.getAttribute('data-category');
+                console.log('Category clicked:', category);
+            });
+        });
+
+        function getChannelStreamUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('stream') || 'https://boishakhi.sonarbanglatv.com/boishakhi/boishakhitv/index.m3u8'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('liveStreamPlayer');
+            const videoWrapper = document.getElementById('videoWrapper');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const playPauseOverlay = document.getElementById('playPauseOverlay');
+            
+            const customControlsBottom = document.getElementById('customControlsBottom'); 
+            
+            const volumeSlider = document.getElementById('volumeSlider');
+            const muteButton = document.getElementById('muteButton');
+            const volumeValueSpan = document.getElementById('volumeValue');
+            const fullscreenButton = document.getElementById('fullscreenButton');
+            const videoSrc = getChannelStreamUrl();
+            let hlsInstance;
+            let controlTimeout;
+
+
+            // --- ভলিউম কন্ট্রোল ফাংশনালিটি ---
+            function updateVolumeIcon() {
+                const icon = muteButton.querySelector('i');
+                if (video.muted || video.volume === 0) {
+                    icon.className = 'fas fa-volume-mute';
+                    volumeSlider.value = 0;
+                    if (volumeValueSpan) volumeValueSpan.textContent = '0%';
+                } else if (video.volume < 0.5) {
+                    icon.className = 'fas fa-volume-down';
+                    if (volumeValueSpan) volumeValueSpan.textContent = `${Math.round(video.volume * 100)}%`;
+                } else {
+                    icon.className = 'fas fa-volume-up';
+                    if (volumeValueSpan) volumeValueSpan.textContent = `${Math.round(video.volume * 100)}%`;
+                }
+            }
+
+            muteButton.addEventListener('click', () => {
+                const wasMuted = video.muted;
+                video.muted = !wasMuted;
+                if (wasMuted && video.volume === 0) {
+                    video.volume = 0.5; 
+                    volumeSlider.value = 0.5;
+                }
+                updateVolumeIcon();
+            });
+
+            volumeSlider.addEventListener('input', () => {
+                video.volume = volumeSlider.value;
+                video.muted = (video.volume === 0);
+                updateVolumeIcon();
+            });
+
+            // ডিফল্ট ভলিউম সেট করা
+            video.volume = volumeSlider.value;
+            video.muted = true; 
+            updateVolumeIcon();
+
+
+            // --- প্লে/পজ ফাংশনালিটি (ক্লিক-টু-টগল) ---
+            videoWrapper.addEventListener('click', (e) => {
+                if (e.target.closest('#customControlsBottom')) {
+                    return; 
+                }
+
+                if (video.paused) {
+                    video.muted = false; 
+                    updateVolumeIcon();
+                    video.play().catch(err => console.warn('Play attempt failed:', err));
+                } else {
+                    video.pause();
+                }
+            });
+
+            video.addEventListener('play', () => {
+                videoWrapper.classList.remove('paused');
+                playPauseOverlay.querySelector('i').className = 'fas fa-pause';
+            });
+
+            video.addEventListener('pause', () => {
+                videoWrapper.classList.add('paused');
+                playPauseOverlay.querySelector('i').className = 'fas fa-play';
+            });
+            
+            // --- কাস্টম কন্ট্রোল হাইড/শো ---
+            function hideControls() {
+                customControlsBottom.classList.remove('active');
+            }
+
+            function showControls() {
+                customControlsBottom.classList.add('active');
+                clearTimeout(controlTimeout);
+                controlTimeout = setTimeout(hideControls, 3000); 
+            }
+
+            videoWrapper.addEventListener('mousemove', showControls);
+            videoWrapper.addEventListener('mouseenter', showControls);
+            videoWrapper.addEventListener('mouseleave', () => {
+                 clearTimeout(controlTimeout);
+                 controlTimeout = setTimeout(hideControls, 1000); 
+            });
+
+
+            // --- ফুলস্ক্রিন ফাংশনালিটি ---
+            fullscreenButton.addEventListener('click', () => {
+                const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+
+                if (isFullscreen) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    }
+                } else {
+                    if (videoWrapper.requestFullscreen) {
+                        videoWrapper.requestFullscreen();
+                    } else if (videoWrapper.webkitRequestFullscreen) {
+                        videoWrapper.webkitRequestFullscreen();
+                    } else if (videoWrapper.mozRequestFullScreen) {
+                        videoWrapper.mozRequestFullScreen();
+                    }
+                }
+            });
+
+            // ফুলস্ক্রিন আইকন আপডেট করা
+            document.addEventListener('fullscreenchange', updateFullscreenIcon);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+            document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+
+            function updateFullscreenIcon() {
+                const icon = fullscreenButton.querySelector('i');
+                if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+                    icon.className = 'fas fa-compress';
+                } else {
+                    icon.className = 'fas fa-expand';
+                }
+            }
+
+
+            // --- লোডিং/বাফারিং হ্যান্ডলিং ---
+            function showLoading() {
+                loadingSpinner.classList.add('active');
+            }
+
+            function hideLoading() {
+                loadingSpinner.classList.remove('active');
+            }
+
+            showLoading(); 
+
+            video.addEventListener('waiting', showLoading);
+            video.addEventListener('playing', hideLoading);
+            video.addEventListener('canplay', hideLoading);
+            video.addEventListener('error', () => {
+                hideLoading();
+                console.error('Video playback error.');
+            });
+
+
+            // --- HLS স্ট্রিম লোড করার ফাংশন ---
+            if (Hls.isSupported()) {
+                hlsInstance = new Hls({
+                    lowLatencyMode: true 
+                });
+                hlsInstance.loadSource(videoSrc);
+                hlsInstance.attachMedia(video);
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(err => console.warn('Autoplay blocked (HLS):', err));
+                });
+                hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        console.error('HLS Fatal error:', data);
+                    } else {
+                        console.error('HLS non-fatal error:', data);
+                    }
+                });
+            } 
+            // Safari/iOS-এর জন্য স্বাভাবিক প্লেব্যাক
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play().catch(err => console.warn('Autoplay blocked (iOS):', err));
+                });
+            } else {
+                hideLoading();
+                console.error('Your browser does not support HLS playback.');
+            }
+        });
+    </script>
+</body>
+</html>

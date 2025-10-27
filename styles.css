@@ -1,0 +1,389 @@
+/* গ্লোবাল স্টাইল এবং রিসেট */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* --- HEADER SECTION STYLES --- */
+.header {
+    background-color: #000000;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    min-height: 60px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logo-text {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.ryvox-brand {
+    color: #ffffff; 
+}
+.tb-brand {
+    color: #00bfff; /* The blue color from the image */
+}
+
+.email-address {
+    font-size: 10px;
+    color: #ffffff;
+    opacity: 0.7;
+    margin: 2px 0 0 0;
+}
+
+.main-nav {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 30px;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.nav-list li {
+    margin: 0 20px;
+}
+
+.nav-list a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+/* New Style: Active Category */
+.nav-list a.active-category {
+    color: #00bfff;
+    border-bottom: 2px solid #00bfff;
+}
+
+.nav-list a:hover {
+    color: #00bfff;
+}
+
+.nav-list a i {
+    margin-right: 8px;
+}
+
+.search-section {
+    display: flex;
+    align-items: center;
+    border: 1px solid #00bfff;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-left: 20px;
+}
+
+.search-input {
+    padding: 8px 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 150px;
+    background-color: #ffffff;
+    color: #333;
+}
+
+.search-button {
+    height: 38px;
+    width: 40px;
+    background-color: #00bfff;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #0099cc;
+}
+
+.menu-toggle {
+    display: none; 
+}
+
+/* --- MAIN CONTENT STYLES --- */
+.main-content {
+    padding: 40px 20px;
+    text-align: center;
+    min-height: 50vh; 
+}
+
+.main-content h2 {
+    color: #00bfff;
+    margin-bottom: 5px;
+}
+
+.main-content p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+/* --- CHANNEL BUTTON STYLES --- */
+.channel-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 20px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.channel-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s, display 0.3s; 
+    overflow: hidden; 
+    border-left: 5px solid #00bfff; /* Default border color */
+}
+
+/* New Style: Channels that will be hidden */
+.channel-card.hidden-channel {
+    display: none; /* JavaScript uses this class to hide channels */
+}
+
+.channel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.channel-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.channel-logo-area {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border: 2px solid #ddd;
+}
+
+.channel-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.channel-info {
+    flex-grow: 1;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.channel-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #000;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.channel-category {
+    font-size: 12px;
+    color: #00bfff;
+    font-weight: 500;
+    margin: 2px 0 0 0;
+}
+
+.channel-link-icon {
+    font-size: 24px;
+    color: #00bfff;
+    margin-left: 10px;
+    transition: color 0.3s;
+}
+
+.channel-card:hover .channel-link-icon {
+    color: #ff4500;
+}
+
+/* Category-based Border Colors */
+
+/* Border color for Sports category cards */
+.sports-category {
+    border-left-color: #ff4500; 
+}
+
+/* Border color for News category cards */
+.news-category {
+    border-left-color: #1e90ff; 
+}
+
+/* Border color for Movie category cards */
+.movie-category {
+    border-left-color: #8a2be2; 
+}
+
+/* ***If you add a new category (e.g., Kids), add the style here:*** */
+/*
+.kids-category {
+    border-left-color: #ffc300; 
+}
+*/
+
+/* --- FOOTER SECTION STYLES --- */
+.footer {
+    background-color: #000000;
+    color: #cccccc;
+    padding: 20px 20px; 
+    border-top: 5px solid #00bfff; 
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around; 
+    flex-wrap: wrap; 
+    gap: 20px; 
+    align-items: center; 
+}
+
+.footer-logo p {
+    font-size: 12px;
+    margin-top: 5px; 
+    color: #888;
+}
+
+.footer-contact h4 {
+    color: #ffffff;
+    border-bottom: 2px solid #00bfff;
+    padding-bottom: 3px; 
+    margin-bottom: 10px; 
+    font-size: 16px; 
+}
+
+.footer-contact p {
+    font-size: 13px; 
+    margin-bottom: 10px; 
+}
+
+.footer-contact p i {
+    margin-right: 6px; 
+    color: #00bfff;
+}
+
+.social-icons a {
+    color: #cccccc;
+    font-size: 16px; 
+    margin-right: 10px; 
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #00bfff;
+}
+
+
+/* --- MOBILE RESPONSIVENESS (Below 768px) --- */
+@media (max-width: 768px) {
+    /* HEADER */
+    .header {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+    .logo-section {
+        flex-grow: 1;
+    }
+    .menu-toggle {
+        display: block;
+    }
+    .search-section {
+        order: 3;
+        width: 100%;
+        margin: 10px 0 0 0;
+    }
+    .search-input {
+        width: calc(100% - 40px);
+    }
+    .main-nav {
+        order: 4;
+        width: 100%;
+        margin-left: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+    }
+    .main-nav.active {
+        max-height: 300px;
+    }
+    .nav-list {
+        flex-direction: column;
+        text-align: left;
+        padding: 10px 0;
+        background-color: #111;
+    }
+    .nav-list a {
+        padding: 10px 20px;
+        border-bottom: 1px solid #333;
+    }
+    .nav-list a.active-category {
+        border-bottom: none;
+        background-color: #00bfff33;
+    }
+
+
+    /* MAIN CONTENT */
+    .channel-list-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* FOOTER */
+    .footer {
+        padding: 15px 10px; 
+    }
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px; 
+    }
+    .footer-logo, .footer-contact { 
+        width: 100%;
+        margin-bottom: 0; 
+    }
+    .footer-contact h4 {
+        margin-top: 5px; 
+    }
+    .social-icons {
+        margin-top: 5px;
+    }
+}
