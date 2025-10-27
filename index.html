@@ -3,164 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RYVOX Tb - Complete Website Layout</title>
-    <link rel="stylesheet" href="styles.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <title>Live TV Player (T-Sports Demo)</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
+    
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #2c3e50; color: #ecf0f1; margin: 0; padding: 20px; }
+        h1 { color: #2ecc71; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #34495e; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+        #videoPlayer { width: 100%; height: auto; background-color: black; border-radius: 8px; margin-bottom: 15px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #e74c3c; color: white; border: none; border-radius: 5px; transition: background-color 0.3s; }
+        button:hover { background-color: #c0392b; }
+        .info { margin-top: 15px; font-size: 1.1em; }
+        .info.loading { color: #f39c12; }
+        .info.success { color: #2ecc71; }
+        .info.error { color: #e74c3c; }
+    </style>
 </head>
 <body>
-    
-    <header class="header">
+
+    <div class="container">
+        <h1>T-Sports Live TV (প্রক্সি সমাধান)</h1>
         
-        <div class="logo-section">
-            <div class="logo-text">
-                <span class="ryvox-brand">RYVOX</span><span class="tb-brand">Tb</span>
-            </div>
-            <p class="email-address">ryvox.tb@gmail.com</p>
-        </div>
+        <video id="videoPlayer" controls autoplay></video> 
         
-        <nav class="main-nav" id="main-nav">
-            <ul class="nav-list">
-                <li><a href="index.html" class="category-link active-category" data-category="all"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="sports.html" class="category-link" data-category="sports"><i class="fas fa-running"></i> Sports</a></li>
-                <li><a href="news.html" class="category-link" data-category="news"><i class="far fa-newspaper"></i> News</a></li>
-                <li><a href="movies.html" class="category-link" data-category="movies"><i class="fas fa-film"></i> Movies</a></li> 
-                </ul>
-        </nav>
-        
-        <div class="search-section">
-            <input type="text" placeholder="Search Tv" class="search-input" id="searchInput">
-            <button class="search-button" id="searchButton"><i class="fas fa-search"></i></button>
-        </div>
+        <button id="playButton" onclick="loadStream()">📺 T-Sports TV প্লে করুন</button>
 
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation">
-            <i class="fas fa-bars"></i>
-        </button>
-
-    </header>
-
-    <main class="main-content">
-        <h2>Welcome!</h2>
-        <p>Use the menu or search box above to find the information you need.</p>
-        
-        <div class="channel-card sports-category channel-card-category-sports">
-                <a href="t_sports.html" class="channel-link">
-                    <div class="channel-logo-area">
-                        <img src="images/T_Sports_logo.png" alt="Breaking News Live Logo" class="channel-logo">
-                    </div>
-                    <div class="channel-info">
-                        <h3 class="channel-name">T Sports</h3>
-                        <p class="channel-category">Sports</p>
-                    </div>
-                    <div class="channel-link-icon">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                </a>
-            </div> 
-
-            <div class="channel-card news-category channel-card-category-news">
-                <a href="t_sports.html" class="channel-link">
-                    <div class="channel-logo-area">
-                        <img src="images/breaking-news-logo.png" alt="Breaking News Live Logo" class="channel-logo">
-                    </div>
-                    <div class="channel-info">
-                        <h3 class="channel-name">National News Today</h3>
-                        <p class="channel-category">News</p>
-                    </div>
-                    <div class="channel-link-icon">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                </a>
-            </div> 
-
-            <div class="channel-card movie-category channel-card-category-movies">
-                <a href="boishakhi_tv.html" class="channel-link">
-                    <div class="channel-logo-area">
-                        <img src="images/Boishakhi_TV_logo.png" alt="Cinema Hub Logo" class="channel-logo">
-                    </div>
-                    <div class="channel-info">
-                        <h3 class="channel-name">Boishakhi TV</h3>
-                        <p class="channel-category">Movies</p>
-                    </div>
-                    <div class="channel-link-icon">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                </a>
-            </div>
-
-        </div>
-    </main>
-    
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-logo">
-                <span class="ryvox-brand">RYVOX</span><span class="tb-brand">Tb</span>
-                <p>&copy; 2024 All Rights Reserved. | Designed by RYVOX</p>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-envelope"></i>: ryvox.tb@gmail.com</p>
-                <div class="social-icons">
-                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
+        <p id="status_message" class="info loading">স্ট্রিম লোড করার জন্য 'প্লে করুন' বাটনে ক্লিক করুন।</p>
+    </div>
 
     <script>
-        // Menu Toggle function
-        document.getElementById('menu-toggle').onclick = function() {
-            document.getElementById('main-nav').classList.toggle('active');
-        };
-
-        // এই পেজের জন্য শুধুমাত্র Search Functionality রাখা হলো
-        const channelCards = document.querySelectorAll('.channel-card');
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
+        const PROXY_URL = "http://localhost:3000/live-tv-proxy"; 
         
-        function performSearch() {
-            const searchTerm = searchInput.value.toLowerCase();
-            
-            // Note: ক্যাটাগরি লিঙ্কগুলির active-category ক্লাস এখন ম্যানুয়ালি আপডেট হবে না, কারণ এগুলি ভিন্ন পেজে নিয়ে যায়। 
+        const video = document.getElementById('videoPlayer');
+        const statusMessage = document.getElementById('status_message');
+        const playButton = document.getElementById('playButton');
+        
+        // প্রথম লোডের সময়ই স্ট্রিম শুরু করার চেষ্টা করা (Autoplay)
+        window.onload = loadStream; 
 
-            channelCards.forEach(card => {
-                const channelName = card.querySelector('.channel-name').textContent.toLowerCase();
-                
-                if (channelName.includes(searchTerm)) {
-                    card.classList.remove('hidden-channel');
-                } else {
-                    card.classList.add('hidden-channel');
-                }
-            });
+        function setStatus(text, className) {
+            statusMessage.textContent = text;
+            statusMessage.className = `info ${className}`;
         }
-        
-        // Search button click
-        searchButton.addEventListener('click', performSearch);
-        
-        // Search on Enter keypress
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
+
+        function loadStream() {
+            setStatus('স্ট্রিম লোড হচ্ছে... প্রক্সি ব্যবহার করে।', 'loading');
+            playButton.disabled = true; 
+            
+            // যদি আগে কোনো Hls ইনস্ট্যান্স থাকে, তবে তা নষ্ট করা 
+            if (window.hls) {
+                window.hls.destroy();
             }
-        });
-        
-        // Home লিঙ্ককে Active করার জন্য একটি নতুন ফাংশন
-        function setActiveLink() {
-            const currentPath = window.location.pathname.split('/').pop(); 
-            const links = document.querySelectorAll('.category-link');
-            
-            // সব লিঙ্ক থেকে active-category সরিয়ে Home-কে active করা হলো
-            links.forEach(link => {
-                link.classList.remove('active-category');
-                if (currentPath === '' || currentPath === 'index.html' || currentPath.includes('index.html')) {
-                    document.querySelector('[data-category="all"]').classList.add('active-category');
-                }
-            });
-        }
-        
-        document.addEventListener('DOMContentLoaded', setActiveLink);
-    </script>
 
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    // কম ল্যাটেন্সির জন্য কনফিগারেশন
+                    liveSyncDurationCount: 3, 
+                    liveMaxLatencyDurationCount: 5,
+                });
+                window.hls = hls;
+                
+                hls.loadSource(PROXY_URL);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play()
+                        .then(() => {
+                            setStatus('✅ T-Sports TV চলছে।', 'success');
+                        })
+                        .catch(error => {
+                            // প্লেব্যাক শুরু করতে না পারলে (যেমন: ব্রাউজারের Autoplay পলিসি)
+                            setStatus('⚠️ অটোপ্লে ব্লক হয়েছে। ভিডিও এরিয়া বাটনটিতে ক্লিক করুন।', 'error');
+                            playButton.disabled = false; 
+                        });
+                });
+                
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) {
+                        hls.destroy();
+                        setStatus(`❌ ত্রুটি: চ্যানেল লোড করা যায়নি। প্রক্সি সার্ভার বা স্ট্রিম লিঙ্ক চেক করুন।`, 'error');
+                        console.error('HLS Fatal Error:', data.details, data.response ? data.response.code : '');
+                        playButton.disabled = false;
+                    }
+                });
+
+            } else {
+                // Safari বা iOS-এর জন্য নেটিভ HLS সাপোর্ট ব্যবহার করা 
+                video.src = PROXY_URL;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                    setStatus('✅ T-Sports TV লোড হয়েছে (Native Support)।', 'success');
+                });
+                video.addEventListener('error', function() {
+                     setStatus('❌ নেটিভ প্লেব্যাক ত্রুটি। স্ট্রিম লিঙ্কটি হয়তো কাজ করছে না।', 'error');
+                     playButton.disabled = false;
+                });
+            }
+        }
+    </script>
 </body>
 </html>
