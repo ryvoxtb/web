@@ -21,7 +21,7 @@
         <nav class="main-nav" id="main-nav">
             <ul class="nav-list">
                 <li><a href="index.html" class="category-link active-category" data-category="all"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="sports.html" class="category-link" data-category="sports"><i class="fas fa-running"></i> Sports</a></li>
+                <li><a href="category\sports.html" class="category-link" data-category="sports"><i class="fas fa-running"></i> Sports</a></li>
                 <li><a href="news.html" class="category-link" data-category="news"><i class="far fa-newspaper"></i> News</a></li>
                 <li><a href="movies.html" class="category-link" data-category="movies"><i class="fas fa-film"></i> Movies</a></li> 
                 </ul>
@@ -42,7 +42,8 @@
         <h2>Welcome!</h2>
         <p>Use the menu or search box above to find the information you need.</p>
         
-        <div class="channel-card sports-category channel-card-category-sports">
+        <div class="channel-list-container">
+            <div class="channel-card sports-category channel-card-category-sports">
                 <a href="t_sports.html" class="channel-link">
                     <div class="channel-logo-area">
                         <img src="images/T_Sports_logo.png" alt="Breaking News Live Logo" class="channel-logo">
@@ -58,9 +59,9 @@
             </div> 
 
             <div class="channel-card news-category channel-card-category-news">
-                <a href="t_sports.html" class="channel-link">
+                <a href="somoy_tv.html" class="channel-link">
                     <div class="channel-logo-area">
-                        <img src="images/breaking-news-logo.png" alt="Breaking News Live Logo" class="channel-logo">
+                        <img src="images/SOMOY_TV_Logo.png" alt="Breaking News Live Logo" class="channel-logo">
                     </div>
                     <div class="channel-info">
                         <h3 class="channel-name">National News Today</h3>
@@ -86,35 +87,30 @@
                     </div>
                 </a>
             </div>
-
         </div>
     </main>
     
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-logo">
-                <span class="ryvox-brand">RYVOX</span><span class="tb-brand">Tb</span>
-                <p>&copy; 2024 All Rights Reserved. | Designed by RYVOX</p>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-envelope"></i>: ryvox.tb@gmail.com</p>
-                <div class="social-icons">
-                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="bottom-nav-link active-bottom-nav">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="sports.html" class="bottom-nav-link">
+            <i class="fas fa-running"></i>
+            <span>Sports</span>
+        </a>
+        <a href="news.html" class="bottom-nav-link">
+            <i class="far fa-newspaper"></i>
+            <span>News</span>
+        </a>
+        <a href="movies.html" class="bottom-nav-link">
+            <i class="fas fa-film"></i>
+            <span>Movies</span>
+        </a>
+    </nav>
+    
     <script>
-        // Menu Toggle function
-        document.getElementById('menu-toggle').onclick = function() {
-            document.getElementById('main-nav').classList.toggle('active');
-        };
-
-        // এই পেজের জন্য শুধুমাত্র Search Functionality রাখা হলো
+        // Search functionality
         const channelCards = document.querySelectorAll('.channel-card');
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
@@ -122,8 +118,6 @@
         function performSearch() {
             const searchTerm = searchInput.value.toLowerCase();
             
-            // Note: ক্যাটাগরি লিঙ্কগুলির active-category ক্লাস এখন ম্যানুয়ালি আপডেট হবে না, কারণ এগুলি ভিন্ন পেজে নিয়ে যায়। 
-
             channelCards.forEach(card => {
                 const channelName = card.querySelector('.channel-name').textContent.toLowerCase();
                 
@@ -144,22 +138,36 @@
                 performSearch();
             }
         });
-        
-        // Home লিঙ্ককে Active করার জন্য একটি নতুন ফাংশন
-        function setActiveLink() {
+
+        // মোবাইল বটম নেভিগেশন হাইলাইট করার জন্য
+        function setActiveBottomNav() {
             const currentPath = window.location.pathname.split('/').pop(); 
-            const links = document.querySelectorAll('.category-link');
+            const links = document.querySelectorAll('.bottom-nav-link');
             
-            // সব লিঙ্ক থেকে active-category সরিয়ে Home-কে active করা হলো
             links.forEach(link => {
+                link.classList.remove('active-bottom-nav');
+                
+                const linkHref = link.getAttribute('href');
+                if (linkHref) {
+                    const linkFile = linkHref.split('/').pop();
+                    
+                    if (linkFile === currentPath || (currentPath === '' && linkFile === 'index.html')) {
+                        link.classList.add('active-bottom-nav');
+                    }
+                }
+            });
+            
+            // ডেস্কটপ মেনু হাইলাইট করার জন্য
+            const desktopLinks = document.querySelectorAll('.category-link');
+             desktopLinks.forEach(link => {
                 link.classList.remove('active-category');
                 if (currentPath === '' || currentPath === 'index.html' || currentPath.includes('index.html')) {
-                    document.querySelector('[data-category="all"]').classList.add('active-category');
+                    document.querySelector('.main-nav [data-category="all"]').classList.add('active-category');
                 }
             });
         }
         
-        document.addEventListener('DOMContentLoaded', setActiveLink);
+        document.addEventListener('DOMContentLoaded', setActiveBottomNav);
     </script>
 
 </body>
